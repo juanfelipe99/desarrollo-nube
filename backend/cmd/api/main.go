@@ -3,6 +3,10 @@ package main
 import (
 	"log/slog"
 	"os"
+
+	_ "time/tzdata"
+
+	"seguimiento/internal/config"
 )
 
 func main() {
@@ -14,6 +18,17 @@ func main() {
 }
 
 func ejecutar(log *slog.Logger) error {
-	log.Info("API iniciada")
+	cfg, err := config.Cargar()
+	if err != nil {
+		return err
+	}
+
+	log.Info(
+		"configuración cargada",
+		"entorno", cfg.Entorno,
+		"puerto", cfg.PuertoHTTP,
+		"zona_horaria", cfg.ZonaHoraria.String(),
+	)
+
 	return nil
 }
