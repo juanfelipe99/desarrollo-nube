@@ -1,0 +1,10 @@
+# Secretos y configuración local 
+.env
+
+# Ejecutables
+backend/api
+backend/worker
+backend/*.exe
+
+# Editores
+.vscode/
