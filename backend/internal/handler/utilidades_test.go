@@ -19,6 +19,7 @@ type entorno struct {
 // configurar permite que cada prueba cambie las dependencias.
 func nuevoEntorno(t *testing.T, configurar func(*Dependencias)) entorno {
 	t.Helper()
+
 	gin.SetMode(gin.TestMode)
 
 	d := Dependencias{

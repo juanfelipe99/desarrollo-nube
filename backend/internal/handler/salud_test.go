@@ -16,7 +16,7 @@ func TestSaludResponde200(t *testing.T) {
 	esperarEstado(t, w, http.StatusOK)
 
 	r := leerEstadoSalud(t, w.Body.Bytes())
-	if r.Estado != "ok" || r.Componentes["postgres"] != "ok" {
+	if r.Estado != estadoOK || r.Componentes["postgres"] != estadoOK {
 		t.Errorf("respuesta inesperada: %+v", r)
 	}
 }
@@ -31,7 +31,7 @@ func TestSaludResponde503SiUnaDependenciaFalla(t *testing.T) {
 	esperarEstado(t, w, http.StatusServiceUnavailable)
 
 	r := leerEstadoSalud(t, w.Body.Bytes())
-	if r.Estado != "degradado" || r.Componentes["redis"] != "error" || r.Componentes["postgres"] != "ok" {
+	if r.Estado != estadoDegradado || r.Componentes["redis"] != estadoError || r.Componentes["postgres"] != estadoOK {
 		t.Errorf("respuesta inesperada: %+v", r)
 	}
 }

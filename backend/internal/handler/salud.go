@@ -11,9 +11,14 @@ import (
 // Tiempo total para revisar todas las dependencias.
 const tiempoMaxSalud = 3 * time.Second
 
+const (
+	estadoOK        = "ok"
+	estadoError     = "error"
+	estadoDegradado = "degradado"
+)
+
 type ComprobadorSalud func(ctx context.Context) error
 
-// Estado: "ok" o "degradado". Cada componente: "ok" o "error".
 type estadoSalud struct {
 	Estado      string            `json:"estado"`
 	Componentes map[string]string `json:"componentes"`
@@ -25,15 +30,15 @@ func salud(comprobadores map[string]ComprobadorSalud) gin.HandlerFunc {
 		ctx, cancelar := context.WithTimeout(c.Request.Context(), tiempoMaxSalud)
 		defer cancelar()
 
-		respuesta := estadoSalud{Estado: "ok", Componentes: map[string]string{}}
+		respuesta := estadoSalud{Estado: estadoOK, Componentes: map[string]string{}}
 		codigo := http.StatusOK
 
 		for nombre, comprobar := range comprobadores {
-			resultado := "ok"
+			resultado := estadoOK
 
 			if err := comprobar(ctx); err != nil {
-				resultado = "error"
-				respuesta.Estado = "degradado"
+				resultado = estadoError
+				respuesta.Estado = estadoDegradado
 				codigo = http.StatusServiceUnavailable
 			}
 

@@ -1,17 +1,14 @@
-// Package config carga la configuración desde variables de entorno.
 package config
 
 import (
 	"errors"
-	"fmt"
-	"os"
-	"strings"
 	"time"
 )
 
 type Config struct {
 	Entorno     string // desarrollo | produccion
 	PuertoHTTP  string
+	BaseDatos   string // URL de conexión
 	ZonaHoraria *time.Location
 }
 
@@ -21,26 +18,17 @@ func (c Config) EsProduccion() bool { return c.Entorno == "produccion" }
 
 // Cargar reúne todos los errores para mostrarlos juntos al arrancar.
 func Cargar() (Config, error) {
-	var errs []error
+	entorno, errEntorno := appEntorno.leer()
+	puerto, errPuerto := appPuerto.leer()
+	baseDatos, errBaseDatos := cargarBaseDatos()
+	zona, errZona := cargarZonaHoraria()
 
 	c := Config{
-		Entorno:    leerVariable("APP_ENTORNO", "desarrollo"),
-		PuertoHTTP: leerVariable("APP_PUERTO", "8080"),
+		Entorno:     entorno,
+		PuertoHTTP:  puerto,
+		BaseDatos:   baseDatos,
+		ZonaHoraria: zona,
 	}
 
-	zona, err := time.LoadLocation(leerVariable("APP_ZONA_HORARIA", "America/Bogota"))
-	if err != nil {
-		errs = append(errs, fmt.Errorf("APP_ZONA_HORARIA: %w", err))
-	}
-	c.ZonaHoraria = zona
-
-	return c, errors.Join(errs...)
-}
-
-func leerVariable(variable, porDefecto string) string {
-	if v := strings.TrimSpace(os.Getenv(variable)); v != "" {
-		return v
-	}
-
-	return porDefecto
+	return c, errors.Join(errEntorno, errPuerto, errBaseDatos, errZona)
 }
