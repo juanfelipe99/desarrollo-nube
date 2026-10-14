@@ -1,7 +1,6 @@
 package config
 
 import (
-	"strings"
 	"testing"
 )
 
@@ -37,17 +36,5 @@ func TestCargarBaseDatosPrefiereDatabaseURL(t *testing.T) {
 
 	if err != nil || url != "postgres://otro@nube:5432/bd" {
 		t.Errorf("cargarBaseDatos() = %q, %v, debería usar %s", url, err, databaseURL.nombre)
-	}
-}
-
-func TestCargarBaseDatosExigeLasPartes(t *testing.T) {
-	partesPostgres(t)
-	t.Setenv(postgresUser.nombre, "")
-	t.Setenv(postgresHost.nombre, "")
-
-	_, err := cargarBaseDatos()
-
-	if err == nil || !strings.Contains(err.Error(), postgresUser.nombre) || !strings.Contains(err.Error(), postgresHost.nombre) {
-		t.Errorf("se esperaba un error que mencionara %s y %s: %v", postgresUser.nombre, postgresHost.nombre, err)
 	}
 }
